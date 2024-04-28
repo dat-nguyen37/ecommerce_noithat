@@ -49,27 +49,30 @@ exports.delete=async(req,reply)=>{
 
 exports.cartByUser=async(req,reply)=>{
     try {
-        const cart=await Cart.find({userId:req.user})
-        const data=[]
-        for(item of cart){
-            const product=await Product.find({_id:item.productId})
-            data.push({quantity:item.quantity,cartId:item._id,totalAmount:item.totalAmount,product})
-        }
-        const result=await Cart.aggregate([
-            {
-                $match:{userId:req.user}
-            },
-            {
-                $group:{
-                    _id:'$userId',
-                    count:{$sum:1},
-                    totalAmount: { $sum: '$totalAmount' } 
-                }
+        if(req.user){
+
+            const cart=await Cart.find({userId:req.user})
+            const data=[]
+            for(item of cart){
+                const product=await Product.find({_id:item.productId})
+                data.push({quantity:item.quantity,cartId:item._id,totalAmount:item.totalAmount,product})
             }
-        ])
-        const count= result.length>0 ?result[0].count : 0;
-        const totalAmount= result.length>0 ?result[0].totalAmount : 0;
-        reply.code(200).send({data,count,totalAmount})
+            const result=await Cart.aggregate([
+                {
+                    $match:{userId:req.user}
+                },
+                {
+                    $group:{
+                        _id:'$userId',
+                        count:{$sum:1},
+                        totalAmount: { $sum: '$totalAmount' } 
+                    }
+                }
+            ])
+            const count= result.length>0 ?result[0].count : 0;
+            const totalAmount= result.length>0 ?result[0].totalAmount : 0;
+            reply.code(200).send({data,count,totalAmount})
+        }
     } catch (err) {
         reply.code(500).send(err)
     }

@@ -30,6 +30,10 @@ fastify.register(require('./router/category'))
 fastify.register(require('./router/cart'))
 fastify.register(require('./router/order'))
 fastify.register(require('./router/payment'))
+fastify.register(require('./router/news'))
+fastify.register(require('./router/comment'))
+
+
 
 
 
